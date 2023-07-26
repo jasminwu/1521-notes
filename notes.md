@@ -39,6 +39,10 @@ If you find any errors in these notes, please let me know by creating an issue o
     - [Environment Variables and `posix_spawn`](#environment-variables-and-posix_spawn)
     - [Using `exec` family functions](#using-exec-family-functions)
     - [Pipes](#pipes)
+  - [Concurrency, Parallelism, Threads](#concurrency-parallelism-threads)
+    - [Concurrency vs Parallelism](#concurrency-vs-parallelism)
+    - [Threads](#threads)
+    - [Mutual Exclusion](#mutual-exclusion)
 
 
 <br>
@@ -259,8 +263,8 @@ When using `posix_spawn`, the environment variables of the parent process are pa
 ```c 
 execvp(const char *file, char *const argv[]);
 ```
-1st argument - path to executable or shell script starting with `#!`
-2nd argument - array of strings containing command line arguments
+1. `file` - path to executable or shell script starting with `#!`
+2. `argv` - array of strings containing command line arguments
 
 All variables in the current process are destroyed when `exec` is called. This means that if we call `exec` in the parent process, the child process will not have access to the variables in the parent process.
 
@@ -278,5 +282,69 @@ int pipe(int pipefd[2]);
 ```
 
 `popen` and `pclose` are unsafe and should not be used. They are not POSIX compliant, and are a security risk, as they allow the child process to execute arbitrary commands on the parent process.
+
+<br>
+
+## Concurrency, Parallelism, Threads
+
+### Concurrency vs Parallelism
+Concurrency is when two or more tasks can start, run, and complete in overlapping time periods. It does not necessarily mean that the tasks are running at the same time. 
+- For example, if we have two tasks, A and B, and A starts running, then B starts running before A has finished, then A and B are concurrent.
+
+Parallelism is when two or more tasks are running at the same time. 
+- For example, if we have two tasks, A and B, and A and B are running at the same time, then A and B are parallel.
+
+
+Therefore, parallelism is a subset of concurrency. All parallel tasks are concurrent, but not all concurrent tasks are parallel.
+
+
+
+### Threads
+A thread is a sequence of instructions that can be executed independently of other code. Allows parallelism within a process.
+
+Threads in a process share:
+- Heap space
+- Share code - functions
+- Share global / static variables
+
+but have their own:
+- Stack space
+
+
+Threads are created using the `pthread_create` function. It takes in 4 arguments:
+```c
+#include <pthread.h>
+int pthread_create(
+pthread_t *thread,
+const pthread_attr_t *attr,
+void *(*start_routine) (void *),
+void *arg);
+```
+
+- `thread` is a pointer to a variable that will store the thread ID of the new thread.
+- `attr` is a pointer to a `pthread_attr_t` struct. This struct is used to specify the attributes of the new thread. For example, we can use this struct to set the stack size of the new thread.
+  - Can be set to `NULL` if we do not want to set any attributes.
+- `start_routine` is a pointer to a function that will be executed by the new thread.
+- `arg` is a pointer to a variable that will be passed to the function specified by `start_routine`.
+
+
+Threads are destroyed using the `pthread_join` function. It takes in 2 arguments:
+```c
+#include <pthread.h>
+int pthread_join(pthread_t thread, void **retval);
+```
+
+- `thread` is the thread ID of the thread that we want to destroy.
+- `retval` is a pointer to a variable that will store the return value of the thread. This is set by the `pthread_exit` function.
+
+
+If `main` returns or `exit()` is called, all threads are terminated. 
+
+
+
+### Mutual Exclusion
+
+Mutual exclusion is a way of preventing multiple threads from accessing the same resource at the same time. This is done using **locks**.
+
 
 
