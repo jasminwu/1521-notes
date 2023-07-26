@@ -27,7 +27,7 @@ A bit of terminology: The number before the ```x``` is `1.0101011` called the **
 Although we could also represent this as ```10.101011 x 2^10```, by convention, $1 \leq \text{mantissa} \lt 2$. This is called **normalisation**. This is done to ensure that the first bit of the mantissa is always 1. Hence, the first bit of the mantissa does not need to be stored, and therefore we can store more significant digits in the mantissa.
 
 
-![Alt text](image.png)
+![Alt text](img/float.png)
 
 
 Important to remember
@@ -44,7 +44,7 @@ Important to remember
 **UTF-8** is a way of encoding Unicode characters into bytes. UTF-8 is a variable length encoding, which means that each character can be represented by a different number of bytes. UTF-8 is backwards compatible with ASCII, which means that ASCII characters can be represented by a single byte in UTF-8.
 
 **UTF-8 Layout**
-![UTF-8](image-1.png)
+![UTF-8](img/utf8.png)
 
 Explanation of the layout:
 - A single UTF-8 character can be anywhere from 1 to 4 bytes long.
