@@ -57,3 +57,49 @@ Explanation of the layout:
 <br>
 
 ### Processes
+A process is an instance of a running program. It has its own memory space, which means that it cannot access the memory of other processes. A process also has its own stack, heap, and registers.
+
+Environment for process running on Unix systems:
+- `argc` - number of command line arguments
+- `argv` - array of command line arguments
+- `envp` - array of environment variables
+  - Values of environment variables are set by the shell and are passed to the process. They are stored in the form `key=value`. 
+  - For example, `PATH=/usr/bin:/bin` is an environment variable that tells the shell where to find the executable files for the commands `ls` and `cat`.
+- `uid` - user identifier
+  - Used to determine the permissions of the process. For example, if the user ID is 0, then the process has admin permissions. 
+  - Must be an integer (POSIX standard)
+- Streams (`stdin`, `stdout`, ``stderr``)
+  - `stdin` is the standard input stream. It is used to read input from the user.
+  - `stdout` is the standard output stream. It is used to print output to the user.
+  - `stderr` is the standard error stream. It is used to print error messages to the user.
+- Return status
+  - An integer that is returned to the shell when the process exits. A return status of 0 indicates that the process exited successfully. A return status of 1 indicates that the process exited with an error.
+
+
+
+**Process Creation**
+In the past, processes were created using the `fork` and `exec` system calls. `fork` creates a copy of the current process, and `exec` replaces the current process with a new process.
+
+Nowadays, we use `posix_spawn` to create processes. `posix_spawn` is a wrapper around `fork` and `exec`. It is more efficient than using `fork` and `exec` separately, as it avoids unnecessary copying of memory. It also is less prone to subtle bugs - more on this later!
+
+
+`posix_spawn` takes in 6 arguments:
+```c
+#include <spawn.h>
+int posix_spawn(
+pid_t *pid, 
+const char *path,
+const posix_spawn_file_actions_t *file_actions,
+const posix_spawnattr_t *attrp,
+char *const argv[], 
+char *const envp[]);
+```
+
+- `pid` is a pointer to a variable that will store the process ID of the new process.
+- `path` is the path to the executable file of the new process.
+- `file_actions` is a pointer to a `posix_spawn_file_actions_t` struct. This struct is used to specify what to do with the standard streams of the new process. For example, we can use this struct to redirect the standard streams to files.
+  - Can be set to `NULL` if we do not want to do anything with the standard streams.
+- `attrp` is a pointer to a `posix_spawnattr_t` struct. This struct is used to specify the attributes of the new process. For example, we can use this struct to set the user ID of the new process.
+  - Can be set to `NULL` if we do not want to set any attributes.
+- `argv` is an array of strings that will be passed to the new process as command line arguments.
+- `envp` is an array of strings that will be passed to the new process as environment variables.
