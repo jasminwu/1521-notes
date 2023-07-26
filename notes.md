@@ -1,7 +1,32 @@
 # COMP1521 Notes
 
+## Introduction
+This document explains some key concepts taught in COMP1521. 
 
-### Two's Complement
+It is not a replacement for the lectures, but rather a supplement to them. It is recommended that you attend/watch the lectures first, then read these notes to get a better understanding of the content.
+
+These notes are not comprehensive, and do not cover all the course content. It mostly consists of concepts that I personally found difficult to understand, or believed required further explanation.
+
+At the end of every section, I have included some practice questions. These questions are not from the course, but are instead questions that I have made up to test your understanding of the content. 
+
+If you would like a more complete set of notes, refer to the lecture slides on the [course webpage](https://cgi.cse.unsw.edu.au/~cs1521).
+
+
+## Table of Contents
+- [COMP1521 Notes](#comp1521-notes)
+  - [Introduction](#introduction)
+  - [Table of Contents](#table-of-contents)
+  - [Two's Complement](#twos-complement)
+  - [Floating Point](#floating-point)
+    - [Exponential Representation - IEEE 754](#exponential-representation---ieee-754)
+  - [Unicode and UTF-8](#unicode-and-utf-8)
+    - [Definitions](#definitions)
+    - [UTF-8 Layout](#utf-8-layout)
+  - [Processes](#processes)
+    - [Process Creation](#process-creation)
+
+
+## Two's Complement
 Two's complement is a way of representing signed integers in binary. It is the most common way of representing signed integers in computers.
 
 To convert a positive number to two's complement, we simply convert it to binary. For example, to convert 5 to two's complement, we convert 5 to binary, which is ```101```.
@@ -12,8 +37,8 @@ For a more intuitive understanding of this representation, refer to this [blog p
 
 <br>
 
-### Floating Point
-**Exponential Representation - IEEE 754**
+## Floating Point
+### Exponential Representation - IEEE 754
 Floats are stored using a representation that is quite similar to scientific notation.
 
 Consider the float ```10.6875```. This can be represented as ```1.06875``` in base 10 scientific notation. 
@@ -38,12 +63,13 @@ Important to remember
 
 
 
-### Unicode and UTF-8
+## Unicode and UTF-8
+### Definitions
 **Unicode** is a standard that assigns a unique number to every character in every language. It is a superset of ASCII, which only contains characters in the English language.
 
 **UTF-8** is a way of encoding Unicode characters into bytes. UTF-8 is a variable length encoding, which means that each character can be represented by a different number of bytes. UTF-8 is backwards compatible with ASCII, which means that ASCII characters can be represented by a single byte in UTF-8.
 
-**UTF-8 Layout**
+### UTF-8 Layout
 ![UTF-8](img/utf8.png)
 
 Explanation of the layout:
@@ -56,7 +82,7 @@ Explanation of the layout:
 
 <br>
 
-### Processes
+## Processes
 A process is an instance of a running program. It has its own memory space, which means that it cannot access the memory of other processes. A process also has its own stack, heap, and registers.
 
 Environment for process running on Unix systems:
@@ -77,7 +103,7 @@ Environment for process running on Unix systems:
 
 
 
-**Process Creation**
+### Process Creation
 In the past, processes were created using the `fork` and `exec` system calls. `fork` creates a copy of the current process, and `exec` replaces the current process with a new process.
 
 Nowadays, we use `posix_spawn` to create processes. `posix_spawn` is a wrapper around `fork` and `exec`. It is more efficient than using `fork` and `exec` separately, as it avoids unnecessary copying of memory. It also is less prone to subtle bugs - more on this later!
