@@ -7,10 +7,12 @@ It is not a replacement for the lectures, but rather a supplement to them. It is
 
 These notes are not comprehensive, and do not cover all the course content. It mostly consists of concepts that I personally found difficult to understand, or believed required further explanation.
 
-At the end of every section, I have included some practice questions. These questions are not from the course, but are instead questions that I have made up to test your understanding of the content. 
-
 If you would like a more complete set of notes, refer to the lecture slides on the [course webpage](https://cgi.cse.unsw.edu.au/~cs1521).
 
+If you find any errors in these notes, please let me know by creating an issue on the [GitHub repository](https://github.com/jasminwu/1521-notes).
+
+
+<br>
 
 ## Table of Contents
 - [COMP1521 Notes](#comp1521-notes)
@@ -19,11 +21,27 @@ If you would like a more complete set of notes, refer to the lecture slides on t
   - [Two's Complement](#twos-complement)
   - [Floating Point](#floating-point)
     - [Exponential Representation - IEEE 754](#exponential-representation---ieee-754)
+    - [Exponent Bias](#exponent-bias)
+    - [Single Precision vs Double Precision](#single-precision-vs-double-precision)
+    - [Bits in a Float](#bits-in-a-float)
   - [Unicode and UTF-8](#unicode-and-utf-8)
     - [Definitions](#definitions)
     - [UTF-8 Layout](#utf-8-layout)
+    - [Tips for the Exam](#tips-for-the-exam)
   - [Processes](#processes)
     - [Process Creation](#process-creation)
+    - [Process Execution State](#process-execution-state)
+    - [Process ID](#process-id)
+    - [Process Hierarchy](#process-hierarchy)
+    - [Multi-tasking](#multi-tasking)
+    - [Process related functions / syscalls](#process-related-functions--syscalls)
+    - [Environment Variable Functions](#environment-variable-functions)
+    - [Environment Variables and `posix_spawn`](#environment-variables-and-posix_spawn)
+    - [Using `exec` family functions](#using-exec-family-functions)
+    - [Pipes](#pipes)
+
+
+<br>
 
 
 ## Two's Complement
@@ -34,6 +52,7 @@ To convert a positive number to two's complement, we simply convert it to binary
 To convert a negative number to two's complement, we first convert it to binary, then invert all the bits, then add 1. For example, to convert -5 to two's complement, we first convert 5 to binary, which is ```101```. Then we invert all the bits, which is ```010```. Then we add 1, which is ```011```. Hence, -5 in two's complement is ```011```.
 
 For a more intuitive understanding of this representation, refer to this [blog post](https://www.ralismark.xyz/posts/twos-complement).
+
 
 <br>
 
@@ -47,15 +66,32 @@ The IEEE 754 standard uses base 2 (binary) or base 10 (decimal), but we will onl
 
 ```10.6875``` in base 2 scientific notation is ```1.0101011 x 2^11```. 
 
-A bit of terminology: The number before the ```x``` is `1.0101011` called the **mantissa**. The **exponent** is the power of 2 that the mantissa is multiplied by. In this case, the exponent is `11`.
+ The number before the ```x``` is `1.0101011` called the **mantissa**. The **exponent** is the power of 2 that the mantissa is multiplied by. In this case, the exponent is `11`.
 
 Although we could also represent this as ```10.101011 x 2^10```, by convention, $1 \leq \text{mantissa} \lt 2$. This is called **normalisation**. This is done to ensure that the first bit of the mantissa is always 1. Hence, the first bit of the mantissa does not need to be stored, and therefore we can store more significant digits in the mantissa.
 
 
+### Exponent Bias
+The exponent is stored as an unsigned integer. However, we want to be able to represent negative exponents as well. To do this, we use **exponent bias**. For example, if the exponent bias is 127, then an exponent of 0 is represented as 127, an exponent of 1 is represented as 128, and an exponent of -1 is represented as 126.
+
+
+### Single Precision vs Double Precision
+The IEEE 754 standard specifies two types of floating point numbers: single precision and double precision. Single precision floats are 32 bits long, and double precision floats are 64 bits long.
+
+
+
+### Bits in a Float
+
+Below is a visual representation of the bits in a float. In a single precision float, the first bit is the sign bit, the next 8 bits are the exponent, and the last 23 bits are the mantissa. 
+
 ![Alt text](img/float.png)
 
 
-Important to remember
+Note that it is not necessary to memorise this diagram. It is only included to give you a better understanding of how floats are stored in memory. 
+
+It is likely that float related exam questions will require you to use bit shifting and masking to extract the sign, exponent, and mantissa from a float. 
+
+**Important**
 - Do not use `==` and `!=` with floating point numbers, as this may cause unexpected behavior due to floating point error. Instead, calculate whether the difference between the two numbers is less than a certain threshold.
 
 
@@ -78,7 +114,8 @@ Explanation of the layout:
 - If the first bit is 1, then the character is a multi-byte character.
 - The number of bytes in a multi-byte character is determined by the number of leading 1s in the first byte. For example, if the first byte is `1110xxxx`, then the character is 3 bytes long.
 
-
+### Tips for the Exam
+- A UTF-8 exam question will likely require knowledge of bit shifting and masking. The UTF-8 layout is relatively simple to memorise, but it might be a good idea to also remember the hexadecimal masks for each byte length.
 
 <br>
 
@@ -100,7 +137,6 @@ Environment for process running on Unix systems:
   - `stderr` is the standard error stream. It is used to print error messages to the user.
 - Return status
   - An integer that is returned to the shell when the process exits. A return status of 0 indicates that the process exited successfully. A return status of 1 indicates that the process exited with an error.
-
 
 
 ### Process Creation
@@ -129,3 +165,118 @@ char *const envp[]);
   - Can be set to `NULL` if we do not want to set any attributes.
 - `argv` is an array of strings that will be passed to the new process as command line arguments.
 - `envp` is an array of strings that will be passed to the new process as environment variables.
+  - This is terminated by a `NULL` pointer.
+  - Accessed using `getenv` and `setenv`, or the global variable `environ`.
+  - In C, the third argument in `main` is `char *env[]`.
+
+
+### Process Execution State
+Each process has an execution state, which is defined by the following:
+- Current values of CPU registers
+- Current contents of memory
+- Information about open files
+
+
+### Process ID
+Each process has a unique process ID. This is an integer that is assigned to the process by the operating system. The process ID is used to identify the process.
+
+If `pid == 1`, then the process is the **init** process. This is the first process that is created when the computer boots up. It is the parent process of all other processes.
+
+
+### Process Hierarchy
+Each process has a parent process. The parent process is the process that created the current process. If the parent process is terminated, the current process' parent becomes the `init` process `(pid == 1)`.
+
+
+### Multi-tasking
+Multi-tasking is the ability to run multiple processes at the same time. This is achieved by the operating system switching between processes. 
+
+The operating system switches between processes by saving the current process' execution state, then loading the execution state of the next process. This is called a **context switch**. 
+
+Context switches are expensive, so the operating system tries to minimise the number of context switches that occur. 
+
+The **scheduler** is the part of the operating system that decides which process to run next. It tries to maximise the amount of time that each process runs for, and minimise the number of context switches that occur. 
+
+**Preemption** is when the scheduler stops a process from running before it has finished executing.
+
+<br>
+
+
+### Process related functions / syscalls
+
+Getting process information
+```c
+#include <unistd.h>
+getpid();           
+// Get the process ID of the current process
+getppid();          // Get the process ID of the parent process
+getpgid();          // Get the process group ID of the current process
+```
+Creating processes
+```c
+#include <unistd.h>
+posix_spawn();      // Create a new process
+fork(); vfork();    // Do not use these
+system(); popen()   // Security risk; do not use
+exec()              // Replace the current process with a new process
+```
+Destroying processes
+```c
+#include <unistd.h>
+exit();             // Exit the current process
+waitpid();          // Wait for a child process to exit
+```
+
+
+### Environment Variable Functions
+```c
+#include <stdlib.h>
+char *getenv(const char *name);
+```
+
+`getenv` returns the value of the environment variable with the given name. If the environment variable does not exist, it returns `NULL`.
+
+```c
+#include <stdlib.h>
+int setenv(const char *name, const char *value, int overwrite);
+```
+
+`setenv` sets the value of the environment variable with the given name to the given value. If the environment variable does not exist, it is created. If the environment variable already exists, it is overwritten if `overwrite` is non-zero. If `overwrite` is zero, the environment variable is not overwritten.
+
+
+**Why are environment variables useful?**
+Simple way to pass settings to all programs. For example, the `LANG` environment variable tells the shell the user's preferred language. This allows the shell to display error messages in the user's language.
+
+
+<br>
+
+### Environment Variables and `posix_spawn`
+When using `posix_spawn`, the environment variables of the parent process are passed to the child process. This means that if we change the value of an environment variable in the parent process, the child process will also see the new value.
+
+
+
+
+### Using `exec` family functions
+```c 
+execvp(const char *file, char *const argv[]);
+```
+1st argument - path to executable or shell script starting with `#!`
+2nd argument - array of strings containing command line arguments
+
+All variables in the current process are destroyed when `exec` is called. This means that if we call `exec` in the parent process, the child process will not have access to the variables in the parent process.
+
+Open files are not closed and PID is not changed when `exec` is called. This means that if we call `exec` in the parent process, the child process will have access to the open files in the parent process, and the child process will have the same PID as the parent process.
+
+
+### Pipes
+A pipe is a channel between two processes that only goes in one direction. It is used to pass data from one process to another.
+
+Pipes are created using the `pipe` system call. It takes in a pointer to an array of two integers. The first integer is the read end of the pipe, and the second integer is the write end of the pipe.
+
+```c
+#include <unistd.h>
+int pipe(int pipefd[2]);
+```
+
+`popen` and `pclose` are unsafe and should not be used. They are not POSIX compliant, and are a security risk, as they allow the child process to execute arbitrary commands on the parent process.
+
+
