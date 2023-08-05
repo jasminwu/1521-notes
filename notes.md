@@ -41,8 +41,15 @@ If you find any errors in these notes, please let me know by creating an issue o
     - [Pipes](#pipes)
   - [Concurrency, Parallelism, Threads](#concurrency-parallelism-threads)
     - [Concurrency vs Parallelism](#concurrency-vs-parallelism)
-    - [Threads](#threads)
+  - [Threads](#threads)
     - [Mutual Exclusion](#mutual-exclusion)
+    - [Atomics](#atomics)
+    - [Lifetimes](#lifetimes)
+    - [Lifetimes in the context of concurrent programming](#lifetimes-in-the-context-of-concurrent-programming)
+    - [Barriers](#barriers)
+  - [Virtual Memory](#virtual-memory)
+    - [Loading Pages from Memory](#loading-pages-from-memory)
+    - [Caching](#caching)
 
 
 <br>
@@ -74,14 +81,18 @@ The IEEE 754 standard uses base 2 (binary) or base 10 (decimal), but we will onl
 
 Although we could also represent this as ```10.101011 x 2^10```, by convention, $1 \leq \text{mantissa} \lt 2$. This is called **normalisation**. This is done to ensure that the first bit of the mantissa is always 1. Hence, the first bit of the mantissa does not need to be stored, and therefore we can store more significant digits in the mantissa.
 
+<br>
 
 ### Exponent Bias
 The exponent is stored as an unsigned integer. However, we want to be able to represent negative exponents as well. To do this, we use **exponent bias**. For example, if the exponent bias is 127, then an exponent of 0 is represented as 127, an exponent of 1 is represented as 128, and an exponent of -1 is represented as 126.
+
+<br>
 
 
 ### Single Precision vs Double Precision
 The IEEE 754 standard specifies two types of floating point numbers: single precision and double precision. Single precision floats are 32 bits long, and double precision floats are 64 bits long.
 
+<br>
 
 
 ### Bits in a Float
@@ -107,7 +118,13 @@ It is likely that float related exam questions will require you to use bit shift
 ### Definitions
 **Unicode** is a standard that assigns a unique number to every character in every language. It is a superset of ASCII, which only contains characters in the English language.
 
-**UTF-8** is a way of encoding Unicode characters into bytes. UTF-8 is a variable length encoding, which means that each character can be represented by a different number of bytes. UTF-8 is backwards compatible with ASCII, which means that ASCII characters can be represented by a single byte in UTF-8.
+**UTF-8** is a way of encoding Unicode characters into bytes.
+
+ UTF-8 is a variable length encoding, which means that each character can be represented by a different number of bytes. 
+
+UTF-8 is backwards compatible with ASCII, which means that ASCII characters can be represented by a single byte in UTF-8.
+
+<br>
 
 ### UTF-8 Layout
 ![UTF-8](img/utf8.png)
@@ -118,8 +135,10 @@ Explanation of the layout:
 - If the first bit is 1, then the character is a multi-byte character.
 - The number of bytes in a multi-byte character is determined by the number of leading 1s in the first byte. For example, if the first byte is `1110xxxx`, then the character is 3 bytes long.
 
+<br>
+
 ### Tips for the Exam
-- A UTF-8 exam question will likely require knowledge of bit shifting and masking. The UTF-8 layout is relatively simple to memorise, but it might be a good idea to also remember the hexadecimal masks for each byte length.
+- A UTF-8 exam question will likely require knowledge of bit shifting and masking. The binary masks can be derived from the UTF-8 layout relatively easily, but it might be a good idea to remember the hexadecimal masks for each byte length.
 
 <br>
 
@@ -142,6 +161,7 @@ Environment for process running on Unix systems:
 - Return status
   - An integer that is returned to the shell when the process exits. A return status of 0 indicates that the process exited successfully. A return status of 1 indicates that the process exited with an error.
 
+<br>
 
 ### Process Creation
 In the past, processes were created using the `fork` and `exec` system calls. `fork` creates a copy of the current process, and `exec` replaces the current process with a new process.
@@ -174,21 +194,28 @@ char *const envp[]);
   - In C, the third argument in `main` is `char *env[]`.
 
 
+<br>
+
+
 ### Process Execution State
 Each process has an execution state, which is defined by the following:
 - Current values of CPU registers
 - Current contents of memory
 - Information about open files
 
+<br>
 
 ### Process ID
 Each process has a unique process ID. This is an integer that is assigned to the process by the operating system. The process ID is used to identify the process.
 
 If `pid == 1`, then the process is the **init** process. This is the first process that is created when the computer boots up. It is the parent process of all other processes.
 
+<br>
 
 ### Process Hierarchy
 Each process has a parent process. The parent process is the process that created the current process. If the parent process is terminated, the current process' parent becomes the `init` process `(pid == 1)`.
+
+<br>
 
 
 ### Multi-tasking
@@ -229,6 +256,7 @@ Destroying processes
 exit();             // Exit the current process
 waitpid();          // Wait for a child process to exit
 ```
+<br>
 
 
 ### Environment Variable Functions
@@ -250,13 +278,13 @@ int setenv(const char *name, const char *value, int overwrite);
 **Why are environment variables useful?**
 Simple way to pass settings to all programs. For example, the `LANG` environment variable tells the shell the user's preferred language. This allows the shell to display error messages in the user's language.
 
-
 <br>
+
 
 ### Environment Variables and `posix_spawn`
 When using `posix_spawn`, the environment variables of the parent process are passed to the child process. This means that if we change the value of an environment variable in the parent process, the child process will also see the new value.
 
-
+<br>
 
 
 ### Using `exec` family functions
@@ -270,6 +298,7 @@ All variables in the current process are destroyed when `exec` is called. This m
 
 Open files are not closed and PID is not changed when `exec` is called. This means that if we call `exec` in the parent process, the child process will have access to the open files in the parent process, and the child process will have the same PID as the parent process.
 
+<br>
 
 ### Pipes
 A pipe is a channel between two processes that only goes in one direction. It is used to pass data from one process to another.
@@ -289,23 +318,24 @@ int pipe(int pipefd[2]);
 
 ### Concurrency vs Parallelism
 Concurrency is when two or more tasks can start, run, and complete in overlapping time periods. It does not necessarily mean that the tasks are running at the same time. 
-- For example, if we have two tasks, A and B, and A starts running, then B starts running before A has finished, then A and B are concurrent.
+> For example, if we have two tasks, A and B, and A starts running, then B starts running before A has finished, then A and B are concurrent.
 
 Parallelism is when two or more tasks are running at the same time. 
-- For example, if we have two tasks, A and B, and A and B are running at the same time, then A and B are parallel.
+> For example, if we have two tasks, A and B, and A and B are running at the same time, then A and B are parallel.
 
 
 Therefore, parallelism is a subset of concurrency. All parallel tasks are concurrent, but not all concurrent tasks are parallel.
 
+<br>
 
 
-### Threads
+## Threads
 A thread is a sequence of instructions that can be executed independently of other code. Allows parallelism within a process.
 
-Threads in a process share:
-- Heap space
-- Share code - functions
-- Share global / static variables
+> Threads in a process share:
+> - Heap space
+> - Share code - functions
+> - Share global / static variables
 
 but have their own:
 - Stack space
@@ -340,11 +370,174 @@ int pthread_join(pthread_t thread, void **retval);
 
 If `main` returns or `exit()` is called, all threads are terminated. 
 
+<br>
 
 
 ### Mutual Exclusion
 
-Mutual exclusion is a way of preventing multiple threads from accessing the same resource at the same time. This is done using **locks**.
+Mutual exclusion (mutex) is a way of preventing multiple threads from accessing the same resource at the same time. This is done using **locks**.
 
+However, mutexes can be slow, as they require context switches. Therefore, we should only use mutexes when necessary.
+
+They also introduce issues such as **deadlock**, **livelock**, and **starvation**. 
+*Note that livelock and starvation are NOT assessable in COMP1521.*
+
+A **deadlock** occurs when two or more processes are unable to proceed because each is waiting for the other(s) to release a resource.
+
+We can avoid deadlocks by ensuring that all processes request resources in the same order. 
+> For example, if process A requests resource 1, then resource 2, and process B requests resource 2, then resource 1, then there will be no deadlock. We also release resources in the reverse order that we requested them.
+
+
+A **livelock** occurs when two or more processes are actively trying to resolve a conflict or a deadlock, but their actions end up repeatedly undoing each other's progress.
+
+**Starvation** is when a process is always denied necessary resources to process its work. This is usually caused by a greedy process that is constantly taking resources from other processes.
+
+
+<br>
+
+### Atomics
+An atomic operation is an operation that is guaranteed to be executed as a single operation. This means that it cannot be interrupted by another thread.
+
+Atomic operations are useful for updating shared variables. For example, if we have a shared variable `x`, and we want to increment it by 1, we can use an atomic operation to ensure that the increment is executed as a single operation.
+
+> Some examples of atomic operations are: 
+> 
+> ![Alt text](image.png)
+>
+ Note that in C, we need to include the library `stdatomic.h` to use atomic operations and define our integers as `atomic_int`.
+
+Atomics allow for lock-free (the system as a whole always makes progess) and also wait-free (every thread always makes progress) code.
+
+Problems with atomics:
+- Not all operations can be made atomic
+- Even though atomics are faster than traditional locking (non context switches), they are still slower than non-atomic operations because they increase program complexity. 
+
+<br>
+
+### Lifetimes
+The lifetime of a variable is the period of time during which the variable exists in memory.
+
+The lifetime of a global variable is the entire execution of the program. 
+
+The lifetime of a local variable is the period of time during which the function is executing. After this, it is no longer on the stack.
+
+The lifetime of a dynamically allocated variable is the period of time between the `malloc` and `free` calls. After this, it is no longer on the heap.
+
+
+<br>
+
+### Lifetimes in the context of concurrent programming
+
+When sharing data with a thread, we can only pass the address of our data. This means that the data must be stored in memory. 
+
+Therefore, we must ensure that the data is still in memory when the thread is accessing it.
+
+
+> Solutions: 
+> - Dynamically allocate memory on the heap
+> - Global variables (not recommended)
+> - Barriers (advanced topic in COMP1521) 
+
+<br>
+
+### Barriers
+A barrier is a way of synchronising threads. It is used to ensure that all threads have reached a certain point in the program before continuing execution.
+
+Therefore, we can use barriers to ensure that the data that we are sharing with the thread is still in memory when the thread is accessing it.
+
+Example code:
+```c
+pthread_t function_creates_thread(void) {
+    pthread_barrier_t barrier;
+
+    // 2 threads need to reach the barrier before they 
+    // can proceed further
+    pthread_barrier_init(&barrier, NULL, 2); 
+
+    struct thread_data data = {
+    .barrier = &barrier,
+    .number = 0x42,
+    };
+
+    pthread_t thread_handle;
+    pthread_create(&thread_handle, NULL, my_thread, &data);
+
+    // Once all threads have reached the barrier, 
+    // they are released simultaneously, and execution continues.
+    pthread_barrier_wait(&barrier);
+
+    return thread_handle
+```
+
+
+
+## Virtual Memory
+
+A key question to think about is, how is memory allocated for each process?
+
+> One potential idea is to allocate one memory segment per process. 
+>
+> However, this is not ideal. Causes problems like fragmentation.
+> 
+> ![Alt text](image-1.png)
+
+Instead, we split process memory across physical memory. Each process has many memory segments, and each segment can be stored in a different location in physical memory. This is called **virtual memory**.
+
+
+ To keep track of which virtual memory addresses correspond to which physical memory addresses, the operating system uses a **page table** for every process. This is implemented as an array.
+
+ The size of these pages is typically the same for all processes in the system. They are also typically a power of 2, because then calculating the offset requires only a bit shift (performance benefit).
+ 
+ For each page in the page table, there is a **base address** that tells the computer where the corresponding physical memory starts. 
+
+> To find the physical address of a specific virtual address:
+> 1. Find the base address of the page that the virtual address is in
+>     - `page_table[V / P]`, where `V` is the virtual address, and `P` is the page size.
+> 2. Find offset, i.e. the distance between the specific virtual address and the start of the page.
+>     -  `V % P`, where `V` is the virtual address, and `P` is the page size.
+>
+> By adding the offset to the base address, the computer calculates the actual physical memory address where the data is stored. 
+> 
+
+When a process completes, all of its pages are released for re-use.
+
+Benefits 
+- Don't need to load all of the process into memory at once. We can load pages into memory as needed.
+- The subset of pages currently loaded is known as the **working set**.
+  - If we only need some of process's pages in memory, the
+process address space can be larger than physical memory
+
+<br>
+
+### Loading Pages from Memory
+
+Read-only Pages
+- Loaded from the executable file
+- Includes code and constants
+  
+For stack and heap variables, the entries in the page table initially map to nothing (i.e., no valid physical addresses). This prevents information leaking from other processes and explains why uninitialised stack variables often equal 0.
+
+
+When a process tries to access a page that is not in memory, the operating system loads the page from memory. This is called a **page fault**.
+
+We need to load the page from memory because the process might need to access the data in that page. However, we can't just load the page into any physical memory address, because it might already be in use by another process. Therefore, we need to find a free physical memory address to load the page into, accessed via a free list.
+
+If there are no free physical memory addresses, we need to free up some memory. We do this by swapping out a page from memory or suspend the requesting process until a page is freed.
+
+
+<br>
+
+### Caching
+
+Caching is a way of storing frequently used data in a faster memory location. This is done to improve performance for `sw`, `lw`, etc operations.
+
+For example, we can store frequently used data in the CPU cache, which is faster than main memory. This means that the CPU can access the data faster.
+
+A CPU cache will holds small blocks of RAM that are have been recently used. 
+
+
+When loading or storing adddress, the cache is first checked.
+- If the block containing that address is there, the cache is used. Much faster than access from RAM.
+- Else, the block containing address is fetched from RAM into cache. If the cache is full, an existing block is evicted. 
 
 
