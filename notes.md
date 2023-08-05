@@ -403,7 +403,7 @@ Atomic operations are useful for updating shared variables. For example, if we h
 
 > Some examples of atomic operations are: 
 > 
-> ![Alt text](image.png)
+> ![Alt text](img/image.png)
 >
  Note that in C, we need to include the library `stdatomic.h` to use atomic operations and define our integers as `atomic_int`.
 
@@ -480,7 +480,7 @@ A key question to think about is, how is memory allocated for each process?
 >
 > However, this is not ideal. Causes problems like fragmentation.
 > 
-> ![Alt text](image-1.png)
+> ![Alt text](img/image-1.png)
 
 Instead, we split process memory across physical memory. Each process has many memory segments, and each segment can be stored in a different location in physical memory. This is called **virtual memory**.
 
