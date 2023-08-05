@@ -103,9 +103,8 @@ Below is a visual representation of the bits in a float. In a single precision f
 ![Alt text](img/float.png)
 
 
-Note that it is not necessary to memorise this diagram. It is only included to give you a better understanding of how floats are stored in memory. 
-
-It is likely that float related exam questions will require you to use bit shifting and masking to extract the sign, exponent, and mantissa from a float. 
+> Note that it is not necessary to memorise this diagram. It is only included to give you a better understanding of how floats are stored in memory. 
+> It is likely that float related exam questions will require you to use bit shifting and masking to extract the sign, exponent, and mantissa from a float. 
 
 **Important**
 - Do not use `==` and `!=` with floating point numbers, as this may cause unexpected behavior due to floating point error. Instead, calculate whether the difference between the two numbers is less than a certain threshold.
@@ -333,13 +332,12 @@ Therefore, parallelism is a subset of concurrency. All parallel tasks are concur
 ### Threads
 A thread is a sequence of instructions that can be executed independently of other code. Allows parallelism within a process.
 
-> Threads in a process share:
-> - Heap space
-> - Share code - functions
-> - Share global / static variables
-
-but have their own:
-- Stack space
+ Threads in a process share:
+ - Heap space
+ - Share code - functions
+ - Share global / static variables
+ but have their own:
+ - Stack space
 
 
 Threads are created using the `pthread_create` function. It takes in 4 arguments:
@@ -386,7 +384,9 @@ They also introduce issues such as **deadlock**, **livelock**, and **starvation*
 A **deadlock** occurs when two or more processes are unable to proceed because each is waiting for the other(s) to release a resource.
 
 We can avoid deadlocks by ensuring that all processes request resources in the same order. 
-> For example, if process A requests resource 1, then resource 2, and process B requests resource 2, then resource 1, then there will be no deadlock. We also release resources in the reverse order that we requested them.
+
+For example, if process A requests resource 1, then resource 2, and process B requests resource 2, then resource 1, then there will be no deadlock. 
+We also release resources in the reverse order that we requested them.
 
 
 A **livelock** occurs when two or more processes are actively trying to resolve a conflict or a deadlock, but their actions end up repeatedly undoing each other's progress.
@@ -434,10 +434,10 @@ When sharing data with a thread, we can only pass the address of our data. This 
 Therefore, we must ensure that the data is still in memory when the thread is accessing it.
 
 
-> Solutions: 
-> - Dynamically allocate memory on the heap
-> - Global variables (not recommended)
-> - Barriers (advanced topic in COMP1521) 
+ Solutions: 
+ - Dynamically allocate memory on the heap
+ - Global variables (not recommended)
+ - Barriers (advanced topic in COMP1521) 
 
 <br>
 
