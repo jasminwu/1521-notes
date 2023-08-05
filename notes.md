@@ -41,7 +41,7 @@ If you find any errors in these notes, please let me know by creating an issue o
     - [Pipes](#pipes)
   - [Concurrency, Parallelism, Threads](#concurrency-parallelism-threads)
     - [Concurrency vs Parallelism](#concurrency-vs-parallelism)
-  - [Threads](#threads)
+    - [Threads](#threads)
     - [Mutual Exclusion](#mutual-exclusion)
     - [Atomics](#atomics)
     - [Lifetimes](#lifetimes)
@@ -60,7 +60,8 @@ Two's complement is a way of representing signed integers in binary. It is the m
 
 To convert a positive number to two's complement, we simply convert it to binary. For example, to convert 5 to two's complement, we convert 5 to binary, which is ```101```.
 
-To convert a negative number to two's complement, we first convert it to binary, then invert all the bits, then add 1. For example, to convert -5 to two's complement, we first convert 5 to binary, which is ```101```. Then we invert all the bits, which is ```010```. Then we add 1, which is ```011```. Hence, -5 in two's complement is ```011```.
+To convert a negative number to two's complement, we first convert it to binary, then invert all the bits, then add 1. 
+> For example, to convert -5 to two's complement, we first convert 5 to binary, which is ```101```. Then we invert all the bits, which is ```010```. Then we add 1, which is ```011```. Hence, -5 in two's complement is ```011```.
 
 For a more intuitive understanding of this representation, refer to this [blog post](https://www.ralismark.xyz/posts/twos-complement).
 
@@ -329,7 +330,7 @@ Therefore, parallelism is a subset of concurrency. All parallel tasks are concur
 <br>
 
 
-## Threads
+### Threads
 A thread is a sequence of instructions that can be executed independently of other code. Allows parallelism within a process.
 
 > Threads in a process share:
