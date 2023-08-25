@@ -20,10 +20,10 @@ If you find any errors in these notes, please let me know by creating an issue o
   - [Table of Contents](#table-of-contents)
   - [Two's Complement](#twos-complement)
   - [Floating Point](#floating-point)
-    - [Exponential Representation - IEEE 754](#exponential-representation---ieee-754)
     - [Exponent Bias](#exponent-bias)
     - [Single Precision vs Double Precision](#single-precision-vs-double-precision)
     - [Bits in a Float](#bits-in-a-float)
+    - [Exponential Representation - IEEE 754](#exponential-representation---ieee-754)
   - [Unicode and UTF-8](#unicode-and-utf-8)
     - [Definitions](#definitions)
     - [UTF-8 Layout](#utf-8-layout)
@@ -72,20 +72,8 @@ For a more intuitive understanding of this representation, refer to this [blog p
 <br>
 
 ## Floating Point
-### Exponential Representation - IEEE 754
-Floats are stored using a representation that is quite similar to scientific notation.
+Floating-point numbers, often referred to as "floats," are a way of representing real numbers in computers. They are used to handle a wide range of values, including both very small and very large numbers, by using a fixed number of bits to represent the sign, exponent, and fraction components of the number.
 
-Consider the float ```10.6875```. This can be represented as ```1.06875``` in base 10 scientific notation. 
-
-The IEEE 754 standard uses base 2 (binary) or base 10 (decimal), but we will only be looking at base 2.
-
-```10.6875``` in base 2 scientific notation is ```1.0101011 x 2^11```. 
-
- The number before the ```x``` is `1.0101011` called the **mantissa**. The **exponent** is the power of 2 that the mantissa is multiplied by. In this case, the exponent is `11`.
-
-Although we could also represent this as ```10.101011 x 2^10```, by convention, $1 \leq \text{mantissa} \lt 2$. This is called **normalisation**. This is done to ensure that the first bit of the mantissa is always 1. Hence, the first bit of the mantissa does not need to be stored, and therefore we can store more significant digits in the mantissa.
-
-<br>
 
 ### Exponent Bias
 The exponent is stored as an unsigned integer. However, we want to be able to represent negative exponents as well. To do this, we use **exponent bias**. For example, if the exponent bias is 127, then an exponent of 0 is represented as 127, an exponent of 1 is represented as 128, and an exponent of -1 is represented as 126.
@@ -112,6 +100,25 @@ Below is a visual representation of the bits in a float. In a single precision f
 **Important**
 - Do not use `==` and `!=` with floating point numbers, as this may cause unexpected behavior due to floating point error. Instead, calculate whether the difference between the two numbers is less than a certain threshold.
 
+<br>
+
+### Exponential Representation - IEEE 754
+The most common standard for representing floating-point numbers is the IEEE 754 standard. This standard defines two formats for floating-point representation: single precision (32-bit) and double precision (64-bit). Here, we'll explain the representation of a single precision float, which uses 32 bits.
+
+For example, let's say we want to represent the decimal number ``6.75`` in IEEE 754 single precision:
+
+    Convert the integer part and fractional part to binary:
+        Integer part: 6 in binary is 110
+        Fractional part: 0.75 in binary is 0.11
+
+    Combine the integer and fractional parts: 6.75 in binary is 110.11
+
+    Normalize the binary representation: Shift the binary point to the right so that you have a single non-zero digit to the left of the binary point: 1.1011 * 2^2
+
+    Determine the sign, exponent, and fraction:
+        Sign bit: 0 (positive)
+        Exponent: The exponent is 2, so the biased exponent is 2 + 127 = 129, which is 10000001 in binary (8 bits).
+        Fraction: Take the fractional part and remove the leading '1', which gives you 1011... (23 bits).
 
 <br>
 
