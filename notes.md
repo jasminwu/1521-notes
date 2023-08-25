@@ -367,7 +367,7 @@ void *arg);
 - `arg` is a pointer to a variable that will be passed to the function specified by `start_routine`.
 
 
-Threads are destroyed using the `pthread_join` function. It takes in 2 arguments:
+The`pthread_join` function causes the current thread to wait until the thread referenced by ``pthread_t`` finishes executing. This is analogous to ``waitpid(3)``. It takes in 2 arguments:
 ```c
 #include <pthread.h>
 int pthread_join(pthread_t thread, void **retval);
