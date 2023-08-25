@@ -61,7 +61,10 @@ Two's complement is a way of representing signed integers in binary. It is the m
 To convert a positive number to two's complement, we simply convert it to binary. For example, to convert 5 to two's complement, we convert 5 to binary, which is ```101```.
 
 To convert a negative number to two's complement, we first convert it to binary, then invert all the bits, then add 1. 
-> For example, to convert -5 to two's complement, we first convert 5 to binary, which is ```101```. Then we invert all the bits, which is ```010```. Then we add 1, which is ```011```. Hence, -5 in two's complement is ```011```.
+> For example, to convert -5 to two's complement, we first convert 5 to binary, which is ```101```. 
+> It is also important to consider the size of our integer. Since two's complement can only store values in the range ``[−2^(N−1), 2^(N−1) − 1]``. This means a 3 bit value can store numbers in the range [-4, 3], -5 is outside this range.
+> Thus, we can instead use a 4 bit integer.
+> Then we invert all the bits, which is ```1010```. Then we add 1, which is ```1011```. Hence, -5 in two's complement is ```1011```.
 
 For a more intuitive understanding of this representation, refer to this [blog post](https://www.ralismark.xyz/posts/twos-complement).
 
