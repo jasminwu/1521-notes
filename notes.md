@@ -492,8 +492,14 @@ A key question to think about is, how is memory allocated for each process?
 > 
 > ![Alt text](img/image-1.png)
 
-Instead, we split process memory across physical memory. Each process has many memory segments, and each segment can be stored in a different location in physical memory. This is called **virtual memory**.
+Instead, the OS maps between a program's 'virtual address space', which is always 0-indexed, contiguous, and of undefined size, to the physical address space, in which the program could be stored at an arbitrary location in RAM, potentially fragmented and stored non-contiguously. This is called **virtual memory**.
 
+
+> Imagine your computer's memory (RAM) like a desk, and the programs you run are like books you need for your work. The desk can only hold a limited number of books at once.
+
+> Now, what if you have more books than can fit on the desk? Virtual memory is like having a magic backpack. You can put some books on the desk (in the RAM) and others into the backpack (on the hard drive). When you need a book that's in the backpack, you swap it with one of the books on the desk. This way, you can work with many books, even though your desk can only hold a few at a time.
+
+> So, virtual memory helps your computer run big programs by using a mix of real memory (RAM) and space on the hard drive to hold data. It makes things work smoothly even if your computer's desk (RAM) isn't big enough for everything you're doing.
 
  To keep track of which virtual memory addresses correspond to which physical memory addresses, the operating system uses a **page table** for every process. This is implemented as an array.
 
