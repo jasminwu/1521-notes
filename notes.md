@@ -393,10 +393,11 @@ They also introduce issues such as **deadlock**, **livelock**, and **starvation*
 
 A **deadlock** occurs when two or more processes are unable to proceed because each is waiting for the other(s) to release a resource.
 
-We can avoid deadlocks by ensuring that all processes request resources in the same order. 
+We can avoid deadlocks by ensuring that for each process, we request a resource and then release it before requesting another resource.
 
-For example, if process A requests resource 1, then resource 2, and process B requests resource 2, then resource 1, then there will be no deadlock. 
-We also release resources in the reverse order that we requested them.
+For example, if process A requests resource 1, and then releases it, and process B requests resource 2 and then releases it, then there will be no deadlock. 
+
+However, if process A requests resource 1, and then requests resource 2, and process B requests resource 2, and then requests resource 1, then this can result in a deadlock.
 
 
 A **livelock** occurs when two or more processes are actively trying to resolve a conflict or a deadlock, but their actions end up repeatedly undoing each other's progress.
